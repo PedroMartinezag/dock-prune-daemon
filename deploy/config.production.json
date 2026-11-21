@@ -1,0 +1,93 @@
+{
+  "log_level": "info",
+  "log_format": "json",
+  "state_dir": "/var/lib/dock-prune-daemon",
+  "dry_run": false,
+  "daemon": {
+    "poll_interval": "30s",
+    "cooldown": "2m",
+    "event_driven": true,
+    "event_debounce": "5s",
+    "pid_file": "/var/lib/dock-prune-daemon/dock-prune.pid",
+    "shutdown_timeout": "20s"
+  },
+  "docker": {
+    "host": "unix:///var/run/docker.sock",
+    "api_version": "",
+    "container_root_dir": "/var/lib/docker",
+    "request_timeout": "15s",
+    "prune_timeout": "5m",
+    "breaker_failure_threshold": 5,
+    "breaker_open_timeout": "60s"
+  },
+  "watermarks": {
+    "preemptive_percent": 65.0,
+    "target_percent": 70.0,
+    "high_percent": 80.0,
+    "critical_percent": 90.0,
+    "panic_percent": 96.0,
+    "min_free_bytes": "5GiB",
+    "panic_free_bytes": "2GiB",
+    "inode_target_percent": 70.0,
+    "inode_high_percent": 80.0,
+    "inode_critical_percent": 92.0
+  },
+  "forecast": {
+    "enabled": true,
+    "horizon": "30m",
+    "alpha": 0.35,
+    "beta": 0.20,
+    "z_score_threshold": 3.0,
+    "window_size": 32
+  },
+  "kernel": {
+    "psi_enabled": true,
+    "proc_root": "/proc",
+    "psi_io_budget_percent": 25.0,
+    "psi_gamma": 2.0,
+    "base_stage_pause": "250ms",
+    "max_stage_pause": "10s",
+    "phantom_scan_enabled": true,
+    "phantom_min_bytes": "64MiB"
+  },
+  "prune": {
+    "enable_log_truncate": true,
+    "max_container_log_bytes": "256MiB",
+    "min_resource_age": "1h",
+    "build_cache_keep_bytes": "5GiB",
+    "enable_stage4_images": true,
+    "enable_volume_prune": false,
+    "protected_labels": [
+      "io.dockprune.keep=true"
+    ],
+    "protected_image_patterns": [
+      "postgres:*",
+      "redis:*",
+      "gcr.io/distroless/*"
+    ],
+    "protected_container_prefixes": [
+      "k8s_",
+      "dock-prune-daemon"
+    ]
+  },
+  "audit": {
+    "enabled": true,
+    "ledger_path": "/var/lib/dock-prune-daemon/audit.jsonl",
+    "private_key_path": "/var/lib/dock-prune-daemon/ed25519.key",
+    "public_key_path": "/var/lib/dock-prune-daemon/ed25519.pub",
+    "max_ledger_bytes": "50MiB",
+    "webhook_url": "",
+    "webhook_hmac_secret": "",
+    "webhook_timeout": "10s",
+    "webhook_max_retries": 3
+  },
+  "telemetry": {
+    "enabled": true,
+    "listen_addr": "127.0.0.1:9402",
+    "bearer_token": "",
+    "enable_web_ui": true,
+    "finops_cost_per_gib_month_usd": 0.10,
+    "finops_incident_cost_usd": 250.0,
+    "finops_ci_minute_cost_usd": 0.016
+  }
+}
