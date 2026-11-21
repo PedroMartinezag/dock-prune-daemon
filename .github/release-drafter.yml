@@ -1,0 +1,89 @@
+name-template: "v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
+version-resolver:
+  major:
+    labels:
+      - "breaking"
+      - "major"
+  minor:
+    labels:
+      - "feature"
+      - "enhancement"
+      - "minor"
+  patch:
+    labels:
+      - "bug"
+      - "fix"
+      - "security"
+      - "performance"
+      - "documentation"
+      - "ci"
+      - "dependencies"
+  default: patch
+
+categories:
+  - title: "🚀 Control Plane Features & CLI"
+    labels:
+      - "feature"
+      - "enhancement"
+  - title: "⚡ Kernel Pacing, Forecasting & DAG Optimization"
+    labels:
+      - "performance"
+  - title: "🛡️ Security, Cryptography & Supply Chain"
+    labels:
+      - "security"
+  - title: "🐛 Bug Fixes & Edge-Case Hardening"
+    labels:
+      - "bug"
+      - "fix"
+  - title: "🧰 CI/CD, Documentation & Maintenance"
+    labels:
+      - "ci"
+      - "documentation"
+      - "dependencies"
+      - "chore"
+
+autolabeler:
+  - label: "feature"
+    branch:
+      - "/^feat\\/.+/"
+    title:
+      - "/^feat(\\(.*\\))?:/"
+  - label: "fix"
+    branch:
+      - "/^fix\\/.+/"
+    title:
+      - "/^fix(\\(.*\\))?:/"
+  - label: "performance"
+    title:
+      - "/^perf(\\(.*\\))?:/"
+  - label: "security"
+    title:
+      - "/^security(\\(.*\\))?:/"
+  - label: "documentation"
+    files:
+      - "*.md"
+    title:
+      - "/^docs(\\(.*\\))?:/"
+  - label: "ci"
+    files:
+      - ".github/**"
+      - "Makefile"
+
+change-template: "- $TITLE (@$AUTHOR) (#$NUMBER)"
+no-changes-template: "- Internal reliability and test hardening."
+
+template: |
+  ## What's Changed in v$RESOLVED_VERSION
+
+  $CHANGES
+
+  ---
+
+  ### 🔐 Supply-Chain Verification (Zero External Dependencies + SLSA Provenance)
+
+  Every static release archive is compiled with `CGO_ENABLED=0`, zero third-party Go modules, SHA-256 checksums, and cryptographic GitHub Artifact Attestations (**SLSA v1.0 Build Provenance**):
+
+  ```bash
+  gh attestation verify dock-prune-daemon_linux_amd64.tar.gz --owner PedroMartinezag
+  sha256sum -c SHA256SUMS
