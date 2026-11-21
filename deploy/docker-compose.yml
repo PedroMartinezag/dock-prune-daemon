@@ -1,0 +1,35 @@
+services:
+  dock-prune-daemon:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: ghcr.io/pedromartinezag/dock-prune-daemon:latest
+    container_name: dock-prune-daemon
+    restart: unless-stopped
+    read_only: true
+    mem_limit: 32m
+    pids_limit: 64
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    labels:
+      io.dockprune.keep: "true"
+    environment:
+      DPD_LOG_LEVEL: "info"
+      DPD_LOG_FORMAT: "json"
+      DPD_PROC_ROOT: "/host/proc"
+      DPD_DOCKER_ROOT_DIR: "/var/lib/docker"
+      DPD_TELEMETRY_LISTEN_ADDR: "0.0.0.0:9402"
+    ports:
+      - "127.0.0.1:9402:9402"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker:/var/lib/docker
+      - /proc:/host/proc:ro
+      - dockprune_state:/var/lib/dock-prune-daemon
+
+volumes:
+  dockprune_state:
+    labels:
+      io.dockprune.keep: "true"
