@@ -1,0 +1,38 @@
+[Unit]
+Description=dock-prune-daemon — Autonomous Container Storage Control Plane
+Documentation=https://github.com/PedroMartinezag/dock-prune-daemon
+After=network.target docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/dock-prune-daemon daemon --config /etc/dock-prune-daemon/config.json
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=25s
+
+# State & Configuration Directories
+StateDirectory=dock-prune-daemon
+StateDirectoryMode=0750
+ConfigurationDirectory=dock-prune-daemon
+
+# Resource Bounds (Zero-Bloat Guarantee)
+MemoryAccounting=true
+MemoryMax=48M
+TasksMax=64
+LimitNOFILE=4096
+
+# Kernel & Filesystem Sandboxing
+NoNewPrivileges=true
+ProtectHome=true
+PrivateTmp=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=multi-user.target
