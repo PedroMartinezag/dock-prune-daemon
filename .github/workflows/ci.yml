@@ -1,0 +1,118 @@
+name: CI — Zero-Dep, Lint, Race Tests & Fuzzing
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-and-test:
+    name: Test & Race (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go 1.23
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23.x"
+          cache: false
+
+      - name: Enforce Zero-External-Dependency Contract
+        run: make verify-zero-dep
+
+      - name: Verify gofmt formatting
+        run: |
+          unformatted="$(gofmt -l .)"
+          if [ -n "${unformatted}" ]; then
+            echo "Unformatted Go files detected:"
+            echo "${unformatted}"
+            exit 1
+          fi
+
+      - name: Run go vet static checks
+        run: go vet ./...
+
+      - name: Run unit & integration tests with Race Detector
+        run: go test -race -count=1 -coverprofile=coverage.out ./...
+
+  lint:
+    name: Static Analysis (golangci-lint v2)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go 1.23
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23.x"
+          cache: false
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v7
+        with:
+          version: v2.1.6
+
+  fuzz-smoke:
+    name: Native Go Fuzz Smoke Suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go 1.23
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23.x"
+          cache: false
+
+      - name: Fuzz config & policy parsers
+        run: |
+          go test ./internal/config -run=^$ -fuzz=FuzzParseByteSize -fuzztime=5s
+          go test ./internal/config -run=^$ -fuzz=FuzzLoadJSON -fuzztime=5s
+          go test ./internal/config -run=^$ -fuzz=FuzzEnvOverrides -fuzztime=5s
+          go test ./internal/engine -run=^$ -fuzz=FuzzMatchGlob -fuzztime=5s
+          go test ./internal/engine -run=^$ -fuzz=FuzzPolicyGuardImageEvaluation -fuzztime=5s
+
+  cross-compile:
+    name: Multi-Arch Static Binary Matrix
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go 1.23
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23.x"
+          cache: false
+
+      - name: Verify static cross-compilation across Linux, macOS & Windows
+        run: |
+          for target in linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64; do
+            GOOS="${target%/*}"
+            GOARCH="${target#*/}"
+            EXT=""
+            [ "${GOOS}" = "windows" ] && EXT=".exe"
+            echo "Building static binary for ${GOOS}/${GOARCH}..."
+            CGO_ENABLED=0 GOOS="${GOOS}" GOARCH="${GOARCH}" \
+              go build -trimpath -ldflags="-s -w" \
+              -o "dist/dock-prune-daemon_${GOOS}_${GOARCH}${EXT}" \
+              ./cmd/dock-prune-daemon
+          done
