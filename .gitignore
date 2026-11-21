@@ -1,0 +1,32 @@
+# Compiled binaries and release artifacts
+dock-prune-daemon
+dock-prune-daemon.exe
+bin/
+dist/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Go test, benchmark, coverage, and local fuzz corpus outputs
+*.test
+*.out
+coverage.txt
+coverage.html
+testdata/fuzz/
+
+# Runtime state, Unix sockets, PID locks, and local cryptographic keys
+*.sock
+*.pid
+*.key
+*.pub
+*.jsonl
+state/
+
+# Editor and operating system metadata
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
