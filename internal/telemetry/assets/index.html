@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>dock-prune-daemon • Storage Control Plane</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --panel: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --ok: #10b981;
+      --warn: #f59e0b;
+      --crit: #ef4444;
+      --accent: #3b82f6;
+      --sponsor: #ea4aaa;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      line-height: 1.5;
+      padding: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .badge {
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      background: var(--panel);
+    }
+    .regime-NOMINAL { color: var(--ok); border-color: var(--ok); }
+    .regime-PREEMPTIVE, .regime-ELEVATED { color: var(--warn); border-color: var(--warn); }
+    .regime-CRITICAL, .regime-PANIC, .regime-DEGRADED { color: var(--crit); border-color: var(--crit); }
+    .controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    input, button, a.btn {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 7px 12px;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    button:hover, a.btn:hover { border-color: var(--accent); }
+    .btn-sponsor { border-color: var(--sponsor); color: #ff80c8; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .card h3 { font-size: 12px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+    .metric { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+    .sub { font-size: 12px; color: var(--muted); }
+    .bar-wrap {
+      width: 100%;
+      height: 8px;
+      background: #21262d;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+    .bar-fill { height: 100%; background: var(--ok); transition: width 0.3s ease; }
+    pre {
+      background: #090d13;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 12px;
+      overflow-x: auto;
+      color: #c9d1d9;
+    }
+    .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--ok); margin-right: 6px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <h2>&gt;_ dock-prune-daemon</h2>
+      <span id="regimeBadge" class="badge regime-NOMINAL">NOMINAL</span>
+      <span class="sub"><span id="sseDot" class="status-dot"></span><span id="sseState">Live Telemetry</span></span>
+    </div>
+    <div class="controls">
+      <input id="tokenInput" type="password" placeholder="Bearer token (if enabled)" />
+      <button id="btnDryRun" type="button">Dry-Run Cycle</button>
+      <button id="btnTrigger" type="button">Trigger Prune</button>
+      <a class="btn btn-sponsor" href="https://github.com/sponsors/PedroMartinezag" target="_blank" rel="noopener noreferrer">♥ Sponsor B2B SLA</a>
+    </div>
+  </header>
+
+  <section class="grid">
+    <div class="card">
+      <h3>Block Storage Utilization</h3>
+      <div id="blockPct" class="metric">--%</div>
+      <div class="bar-wrap"><div id="blockBar" class="bar-fill" style="width:0%"></div></div>
+      <div id="blockSub" class="sub">Waiting for snapshot...</div>
+    </div>
+    <div class="card">
+      <h3>Inode Table Pressure</h3>
+      <div id="inodePct" class="metric">--%</div>
+      <div class="bar-wrap"><div id="inodeBar" class="bar-fill" style="width:0%"></div></div>
+      <div id="inodeSub" class="sub">Waiting for snapshot...</div>
+    </div>
+    <div class="card">
+      <h3>Holt-Winters Kinematics &amp; PSI</h3>
+      <div id="tteVal" class="metric">Stable</div>
+      <div id="psiSub" class="sub">Burn velocity: 0 B/s • PSI IO: 0%</div>
+    </div>
+    <div class="card">
+      <h3>FinOps Cumulative Value Saved</h3>
+      <div id="roiVal" class="metric" style="color:var(--ok)">$0.00</div>
+      <div id="roiSub" class="sub">0.00 GiB reclaimed • 0 ENOSPC averted</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h3>Latest Surgical Reclamation Audit</h3>
+    <pre id="cycleJson">Connecting to control plane...</pre>
+  </section>
+
+  <script>
+    (function () {
+      const tokenEl = document.getElementById('tokenInput');
+      const fmtGiB = (b) => (Number(b || 0) / (1024 * 1024 * 1024)).toFixed(2) + ' GiB';
+
+      function authHeaders() {
+        const h = { 'Accept': 'application/json', 'Content-Type': 'application/json' };
+        const t = tokenEl.value.trim();
+        if (t) h['Authorization'] = 'Bearer ' + t;
+        return h;
+      }
+
+      function renderStatus(data) {
+        if (!data) return;
+        const reg = data.regime || 'NOMINAL';
+        const badge = document.getElementById('regimeBadge');
+        badge.textContent = reg;
+        badge.className = 'badge regime-' + reg;
+
+        if (data.disk) {
+          const bp = Number(data.disk.used_percent || 0);
+          document.getElementById('blockPct').textContent = bp.toFixed(1) + '%';
+          document.getElementById('blockBar').style.width = Math.min(100, bp) + '%';
+          document.getElementById('blockSub').textContent =
+            fmtGiB(data.disk.free_bytes) + ' free of ' + fmtGiB(data.disk.total_bytes);
+
+          const ip = Number(data.disk.inode_used_percent || 0);
+          document.getElementById('inodePct').textContent = ip.toFixed(1) + '%';
+          document.getElementById('inodeBar').style.width = Math.min(100, ip) + '%';
+          document.getElementById('inodeSub').textContent =
+            (data.disk.free_inodes || 0) + ' free inodes';
+        }
+
+        if (data.forecast) {
+          const tte = Number(data.forecast.block_tte_seconds || -1);
+          document.getElementById('tteVal').textContent = tte > 0 ? Math.round(tte / 60) + 'm TTE' : 'Stable';
+          const velKB = (Number(data.forecast.block_velocity_bps || 0) / 1024).toFixed(1);
+          const psiIO = data.psi && data.psi.io_some ? Number(data.psi.io_some.avg10 || 0).toFixed(1) : '0.0';
+          document.getElementById('psiSub').textContent =
+            'Burn: ' + velKB + ' KiB/s • PSI IO: ' + psiIO + '%';
+        }
+
+        if (data.finops) {
+          document.getElementById('roiVal').textContent = '$' + Number(data.finops.estimated_total_savings_usd || 0).toFixed(2);
+          document.getElementById('roiSub').textContent =
+            Number(data.finops.total_actual_reclaimed_gib || 0).toFixed(2) + ' GiB freed • ' +
+            ((data.finops.state && data.finops.state.enospc_averted_count) || 0) + ' ENOSPC averted';
+        }
+
+        document.getElementById('cycleJson').textContent = JSON.stringify(data.last_cycle || data, null, 2);
+      }
+
+      async function pollStatus() {
+        try {
+          const res = await fetch('/v1/status', { headers: authHeaders() });
+          if (!res.ok) {
+            document.getElementById('sseState').textContent = 'Auth required (HTTP ' + res.status + ')';
+            return;
+          }
+          renderStatus(await res.json());
+          document.getElementById('sseState').textContent = 'Synced';
+        } catch (err) {
+          document.getElementById('sseState').textContent = 'Disconnected';
+        }
+      }
+
+      async function triggerCycle(dryRun) {
+        try {
+          const res = await fetch('/v1/trigger', {
+            method: 'POST',
+            headers: authHeaders(),
+            body: JSON.stringify({ dry_run: dryRun, force: true })
+          });
+          const body = await res.json();
+          document.getElementById('cycleJson').textContent = JSON.stringify(body, null, 2);
+          await pollStatus();
+        } catch (e) {
+          document.getElementById('cycleJson').textContent = String(e);
+        }
+      }
+
+      document.getElementById('btnDryRun').addEventListener('click', () => triggerCycle(true));
+      document.getElementById('btnTrigger').addEventListener('click', () => triggerCycle(false));
+      tokenEl.addEventListener('change', pollStatus);
+
+      pollStatus();
+      setInterval(pollStatus, 10000);
+
+      if (window.EventSource && !tokenEl.value.trim()) {
+        const es = new EventSource('/v1/events');
+        es.onmessage = (ev) => {
+          try { renderStatus(JSON.parse(ev.data)); } catch (_) {}
+        };
+      }
+    })();
+  </script>
+</body>
+</html>
