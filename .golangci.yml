@@ -17,6 +17,14 @@ linters:
     errcheck:
       check-type-assertions: false
       check-blank: false
+      exclude-functions:
+        - fmt.Fprint
+        - fmt.Fprintf
+        - fmt.Fprintln
+        - (io.Closer).Close
+        - (io.ReadCloser).Close
+        - (*os.File).Close
+        - (net.Conn).Close
     errorlint:
       errorf: true
       asserts: true
@@ -25,6 +33,8 @@ linters:
       locale: US
   exclusions:
     generated: lax
+    presets:
+      - std-error-handling
     rules:
       - path: _test\.go
         linters:
