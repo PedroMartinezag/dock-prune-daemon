@@ -35,16 +35,16 @@ type ExplainFunc func(ctx context.Context) (engine.ExplainReport, error)
 
 // StatusSnapshot is serialized by GET /v1/status and broadcast over GET /v1/events SSE.
 type StatusSnapshot struct {
-	Timestamp  time.Time           `json:"timestamp"`
-	Build      buildinfo.Info      `json:"build"`
-	Regime     disk.Regime         `json:"regime"`
-	Disk       disk.Snapshot       `json:"disk"`
-	Forecast   disk.ForecastResult `json:"forecast"`
-	PSI        kernel.PSISnapshot  `json:"psi"`
-	Breaker    docker.BreakerStats `json:"breaker"`
-	FinOps     finops.Report       `json:"finops"`
-	LastCycle  *engine.CycleReport `json:"last_cycle,omitempty"`
-	Config     config.Config       `json:"config"`
+	Timestamp time.Time           `json:"timestamp"`
+	Build     buildinfo.Info      `json:"build"`
+	Regime    disk.Regime         `json:"regime"`
+	Disk      disk.Snapshot       `json:"disk"`
+	Forecast  disk.ForecastResult `json:"forecast"`
+	PSI       kernel.PSISnapshot  `json:"psi"`
+	Breaker   docker.BreakerStats `json:"breaker"`
+	FinOps    finops.Report       `json:"finops"`
+	LastCycle *engine.CycleReport `json:"last_cycle,omitempty"`
+	Config    config.Config       `json:"config"`
 }
 
 // ServerOptions bundles dependencies for the HTTP observability and control plane.

@@ -79,9 +79,9 @@ type Notifier struct {
 	httpClient *http.Client
 	nowFn      func() time.Time
 
-	queue   chan WebhookPayload
-	closed  atomic.Bool
-	wg      sync.WaitGroup
+	queue  chan WebhookPayload
+	closed atomic.Bool
+	wg     sync.WaitGroup
 
 	deliveredCount atomic.Uint64
 	failedCount    atomic.Uint64

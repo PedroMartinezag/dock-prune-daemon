@@ -19,39 +19,39 @@ import (
 )
 
 const (
-	stateFileName                    = "finops_state.json"
-	stateSchemaVersion               = "dpd-finops-v1"
-	estimatedWarmCacheSavedMinutes   = 3.0
-	referenceTeamSponsorMonthlyUSD   = 150.0
+	stateFileName                  = "finops_state.json"
+	stateSchemaVersion             = "dpd-finops-v1"
+	estimatedWarmCacheSavedMinutes = 3.0
+	referenceTeamSponsorMonthlyUSD = 150.0
 )
 
 // PersistedState stores cumulative operational counters across daemon restarts.
 type PersistedState struct {
-	Schema                     string    `json:"schema"`
-	FirstRecordedAt            time.Time `json:"first_recorded_at"`
-	LastUpdatedAt              time.Time `json:"last_updated_at"`
-	TotalCycles                uint64    `json:"total_cycles"`
-	ActiveReclaimCycles        uint64    `json:"active_reclaim_cycles"`
-	DryRunCycles               uint64    `json:"dry_run_cycles"`
-	TotalActualReclaimedBytes  uint64    `json:"total_actual_reclaimed_bytes"`
-	TotalReportedReclaimedBytes uint64   `json:"total_reported_reclaimed_bytes"`
-	TotalLogTruncatedBytes     uint64    `json:"total_log_truncated_bytes"`
-	PeakSingleReclaimBytes     uint64    `json:"peak_single_reclaim_bytes"`
-	ENOSPCAvertedCount         uint64    `json:"enospc_averted_count"`
-	BuildCachePreservedCycles  uint64    `json:"build_cache_preserved_cycles"`
+	Schema                      string    `json:"schema"`
+	FirstRecordedAt             time.Time `json:"first_recorded_at"`
+	LastUpdatedAt               time.Time `json:"last_updated_at"`
+	TotalCycles                 uint64    `json:"total_cycles"`
+	ActiveReclaimCycles         uint64    `json:"active_reclaim_cycles"`
+	DryRunCycles                uint64    `json:"dry_run_cycles"`
+	TotalActualReclaimedBytes   uint64    `json:"total_actual_reclaimed_bytes"`
+	TotalReportedReclaimedBytes uint64    `json:"total_reported_reclaimed_bytes"`
+	TotalLogTruncatedBytes      uint64    `json:"total_log_truncated_bytes"`
+	PeakSingleReclaimBytes      uint64    `json:"peak_single_reclaim_bytes"`
+	ENOSPCAvertedCount          uint64    `json:"enospc_averted_count"`
+	BuildCachePreservedCycles   uint64    `json:"build_cache_preserved_cycles"`
 }
 
 // Report combines cumulative counters with live USD FinOps valuations.
 type Report struct {
-	State                      PersistedState `json:"state"`
-	TotalActualReclaimedGiB    float64        `json:"total_actual_reclaimed_gib"`
-	PeakSingleReclaimGiB       float64        `json:"peak_single_reclaim_gib"`
-	CIMinutesSavedEstimate     float64        `json:"ci_minutes_saved_estimate"`
-	StorageSavingsUSD          float64        `json:"storage_savings_usd"`
-	IncidentAvoidanceUSD       float64        `json:"incident_avoidance_usd"`
-	WarmCacheSavingsUSD        float64        `json:"warm_cache_savings_usd"`
-	EstimatedTotalSavingsUSD   float64        `json:"estimated_total_savings_usd"`
-	TeamSponsorROIMultiple     float64        `json:"team_sponsor_roi_multiple"`
+	State                    PersistedState `json:"state"`
+	TotalActualReclaimedGiB  float64        `json:"total_actual_reclaimed_gib"`
+	PeakSingleReclaimGiB     float64        `json:"peak_single_reclaim_gib"`
+	CIMinutesSavedEstimate   float64        `json:"ci_minutes_saved_estimate"`
+	StorageSavingsUSD        float64        `json:"storage_savings_usd"`
+	IncidentAvoidanceUSD     float64        `json:"incident_avoidance_usd"`
+	WarmCacheSavingsUSD      float64        `json:"warm_cache_savings_usd"`
+	EstimatedTotalSavingsUSD float64        `json:"estimated_total_savings_usd"`
+	TeamSponsorROIMultiple   float64        `json:"team_sponsor_roi_multiple"`
 }
 
 // Tracker maintains thread-safe FinOps telemetry backed by atomic JSON persistence.

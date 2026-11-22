@@ -16,16 +16,16 @@ const (
 // ForecastResult contains kinematic burn-rate, acceleration, Z-score anomaly,
 // and quadratic Time-To-Exhaustion (TTE) projections for blocks and inodes.
 type ForecastResult struct {
-	Samples             int     `json:"samples"`
-	Ready               bool    `json:"ready"`
-	BlockVelocityBps    float64 `json:"block_velocity_bps"`
-	BlockAccelBps2      float64 `json:"block_accel_bps2"`
-	BlockTTESeconds     float64 `json:"block_tte_seconds"`
-	InodeVelocityIps    float64 `json:"inode_velocity_ips"`
-	InodeAccelIps2      float64 `json:"inode_accel_ips2"`
-	InodeTTESeconds     float64 `json:"inode_tte_seconds"`
-	BurnZScore          float64 `json:"burn_z_score"`
-	AnomalyTriggered    bool    `json:"anomaly_triggered"`
+	Samples          int     `json:"samples"`
+	Ready            bool    `json:"ready"`
+	BlockVelocityBps float64 `json:"block_velocity_bps"`
+	BlockAccelBps2   float64 `json:"block_accel_bps2"`
+	BlockTTESeconds  float64 `json:"block_tte_seconds"`
+	InodeVelocityIps float64 `json:"inode_velocity_ips"`
+	InodeAccelIps2   float64 `json:"inode_accel_ips2"`
+	InodeTTESeconds  float64 `json:"inode_tte_seconds"`
+	BurnZScore       float64 `json:"burn_z_score"`
+	AnomalyTriggered bool    `json:"anomaly_triggered"`
 }
 
 // Forecaster implements thread-safe Holt-Winters double-exponential smoothing

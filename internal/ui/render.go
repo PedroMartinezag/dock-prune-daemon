@@ -64,16 +64,16 @@ type DoctorReport struct {
 
 // TopFrame bundles real-time sensor telemetry rendered by 'dock-prune-daemon top'.
 type TopFrame struct {
-	CapturedAt time.Time           `json:"captured_at"`
-	Iteration  int                 `json:"iteration"`
-	Regime     disk.Regime         `json:"regime"`
-	Disk       disk.Snapshot       `json:"disk"`
-	Forecast   disk.ForecastResult `json:"forecast"`
-	PSI        kernel.PSISnapshot  `json:"psi"`
-	Breaker    docker.BreakerStats `json:"breaker"`
+	CapturedAt time.Time            `json:"captured_at"`
+	Iteration  int                  `json:"iteration"`
+	Regime     disk.Regime          `json:"regime"`
+	Disk       disk.Snapshot        `json:"disk"`
+	Forecast   disk.ForecastResult  `json:"forecast"`
+	PSI        kernel.PSISnapshot   `json:"psi"`
+	Breaker    docker.BreakerStats  `json:"breaker"`
 	Phantom    kernel.PhantomReport `json:"phantom"`
-	FinOps     finops.Report       `json:"finops"`
-	LastCycle  *engine.CycleReport `json:"last_cycle,omitempty"`
+	FinOps     finops.Report        `json:"finops"`
+	LastCycle  *engine.CycleReport  `json:"last_cycle,omitempty"`
 }
 
 // Renderer formats structured telemetry for interactive terminals and CI logs.

@@ -50,8 +50,8 @@ type Coordinator struct {
 
 	reloadNotify chan time.Duration
 
-	cooldownMu       sync.Mutex
-	lastActivePrune  time.Time
+	cooldownMu      sync.Mutex
+	lastActivePrune time.Time
 }
 
 // NewCoordinator wires and validates all control-plane subsystems prior to entering Run.

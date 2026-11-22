@@ -15,7 +15,6 @@ import (
 	"github.com/PedroMartinezag/dock-prune-daemon/internal/kernel"
 )
 
-
 func TestRenderer_NoColorCompliance_AndAllDiagnosticViews(t *testing.T) {
 	t.Parallel()
 

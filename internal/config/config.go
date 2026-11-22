@@ -106,6 +106,7 @@ func (b *ByteSize) UnmarshalJSON(data []byte) error {
 	*b = ByteSize(rawInt)
 	return nil
 }
+
 // ParseByteSize parses strings like "0", "4096B", "64MiB", "1.5GiB", or "500MB" with overflow guards.
 func ParseByteSize(raw string) (ByteSize, error) {
 	s := strings.TrimSpace(raw)
@@ -258,6 +259,7 @@ func ParseDuration(raw string) (Duration, error) {
 	}
 	return Duration(parsed), nil
 }
+
 // Config is the root strongly typed configuration contract for dock-prune-daemon.
 type Config struct {
 	LogLevel   string          `json:"log_level"`
@@ -318,6 +320,7 @@ type ForecastConfig struct {
 	ZScoreThreshold float64  `json:"z_score_threshold"`
 	WindowSize      int      `json:"window_size"`
 }
+
 // KernelConfig configures Linux PSI I/O stall pacing and ProcFS phantom FD scanning.
 type KernelConfig struct {
 	PSIEnabled         bool     `json:"psi_enabled"`
@@ -366,6 +369,7 @@ type TelemetryConfig struct {
 	FinOpsIncidentCostUSD    float64 `json:"finops_incident_cost_usd"`
 	FinOpsCIMinuteCostUSD    float64 `json:"finops_ci_minute_cost_usd"`
 }
+
 // Default returns a production-hardened baseline configuration.
 func Default() Config {
 	cfg := Config{
@@ -455,6 +459,7 @@ func Default() Config {
 	cfg.Normalize()
 	return cfg
 }
+
 // Clone returns a deep copy of Config so callers cannot mutate shared slice backing arrays.
 func (c Config) Clone() Config {
 	cp := c
@@ -507,6 +512,7 @@ func (c *Config) Normalize() {
 	c.Prune.ProtectedImagePatterns = compactNonEmpty(c.Prune.ProtectedImagePatterns)
 	c.Prune.ProtectedContainerPrefixes = compactNonEmpty(c.Prune.ProtectedContainerPrefixes)
 }
+
 // Validate checks all mathematical, hysteresis, security, and network invariants.
 func (c Config) Validate() error {
 	var errs []error
@@ -688,6 +694,7 @@ func (c Config) Validate() error {
 
 	return errors.Join(errs...)
 }
+
 // MergeJSONBytes decodes strict JSON (rejecting unknown fields and trailing data) onto dst.
 func MergeJSONBytes(dst *Config, raw []byte) error {
 	if dst == nil {
@@ -726,6 +733,7 @@ func MergeJSONFile(dst *Config, path string) error {
 	}
 	return nil
 }
+
 // EnvLookupFunc abstracts os.LookupEnv for deterministic concurrent testing.
 type EnvLookupFunc func(key string) (string, bool)
 
@@ -834,6 +842,7 @@ func ApplyEnv(dst *Config, lookup EnvLookupFunc) error {
 
 	return errors.Join(errs...)
 }
+
 // FlagOverrides captures CLI flags bound to a FlagSet and applies only explicitly visited flags.
 type FlagOverrides struct {
 	fs              *flag.FlagSet
@@ -887,6 +896,7 @@ func (o *FlagOverrides) ConfigPath(lookup EnvLookupFunc) string {
 	}
 	return ""
 }
+
 // Apply overlays only the flags explicitly passed on the command line onto dst.
 func (o *FlagOverrides) Apply(dst *Config) error {
 	if o == nil || o.fs == nil || dst == nil {
@@ -978,6 +988,7 @@ func Load(configPath string, lookup EnvLookupFunc, flags *FlagOverrides) (Config
 	}
 	return cfg, nil
 }
+
 // Store holds the active Config inside a lock-free atomic pointer for SIGHUP hot-reloading.
 type Store struct {
 	active     atomic.Pointer[Config]

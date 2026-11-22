@@ -58,9 +58,9 @@ func TestPrecedence_Defaults_JSON_Env_CLIFlags(t *testing.T) {
 	}
 
 	envMap := map[string]string{
-		"DPD_LOG_LEVEL":          "debug",
-		"DPD_WATERMARK_HIGH":     "82.5",
-		"DPD_PROTECTED_LABELS":   "env.keep=true, team.critical=1",
+		"DPD_LOG_LEVEL":           "debug",
+		"DPD_WATERMARK_HIGH":      "82.5",
+		"DPD_PROTECTED_LABELS":    "env.keep=true, team.critical=1",
 		"DPD_WEBHOOK_HMAC_SECRET": "top-secret-hmac-key",
 	}
 	lookup := func(k string) (string, bool) {

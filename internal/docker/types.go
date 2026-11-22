@@ -135,6 +135,7 @@ type ContainerInspect struct {
 	SizeRootFs *int64          `json:"SizeRootFs,omitempty"`
 	Mounts     []MountPoint    `json:"Mounts"`
 }
+
 // ImageSummary models an entry from GET /images/json.
 type ImageSummary struct {
 	ID          string            `json:"Id"`
@@ -264,6 +265,7 @@ type VolumeListResponse struct {
 	Volumes  []Volume `json:"Volumes"`
 	Warnings []string `json:"Warnings"`
 }
+
 // ContainersPruneReport models POST /containers/prune output.
 type ContainersPruneReport struct {
 	ContainersDeleted []string `json:"ContainersDeleted"`
