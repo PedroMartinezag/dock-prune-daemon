@@ -926,6 +926,9 @@ func (o *FlagOverrides) Apply(dst *Config) error {
 			dst.Daemon.PollInterval = d
 		case "target-percent":
 			dst.Watermarks.TargetPercent = o.targetPercent
+			if o.targetPercent >= 1.0 && dst.Watermarks.PreemptivePercent > o.targetPercent {
+				dst.Watermarks.PreemptivePercent = o.targetPercent
+			}
 		case "high-percent":
 			dst.Watermarks.HighPercent = o.highPercent
 		case "critical-percent":

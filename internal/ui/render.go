@@ -17,7 +17,6 @@ import (
 	"github.com/PedroMartinezag/dock-prune-daemon/internal/docker"
 	"github.com/PedroMartinezag/dock-prune-daemon/internal/engine"
 	"github.com/PedroMartinezag/dock-prune-daemon/internal/finops"
-	"github.com/PedroMartinezag/dock-prune-daemon/internal/graph"
 	"github.com/PedroMartinezag/dock-prune-daemon/internal/kernel"
 )
 
