@@ -401,7 +401,7 @@ func is64LowerHex(s string) bool {
 	}
 	for i := 0; i < 64; i++ {
 		c := s[i]
-		if !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')) {
+		if (c < '0' || c > '9') && (c < 'a' || c > 'f') {
 			return false
 		}
 	}

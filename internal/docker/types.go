@@ -253,7 +253,7 @@ func (v Volume) IsAnonymous() bool {
 	}
 	for i := 0; i < 64; i++ {
 		ch := v.Name[i]
-		if !((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f')) {
+		if (ch < '0' || ch > '9') && (ch < 'a' || ch > 'f') {
 			return false
 		}
 	}

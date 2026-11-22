@@ -176,6 +176,7 @@ func (c *Client) Ping(ctx context.Context) (PingInfo, error) {
 		if err != nil {
 			return fmt.Errorf("ping docker daemon: %w", err)
 		}
+		defer resp.Body.Close()
 		defer drainAndClose(resp.Body)
 
 		if resp.StatusCode >= 400 {
@@ -477,11 +478,12 @@ func (c *Client) streamEventsOnce(
 	var resp *http.Response
 	err = c.breaker.Execute(ctx, func(callCtx context.Context) error {
 		var doErr error
-		resp, doErr = c.httpClient.Do(req.WithContext(callCtx))
+		resp, doErr = c.httpClient.Do(req.WithContext(callCtx)) //nolint:bodyclose // closed on >=400 below or by outer defer
 		if doErr != nil {
 			return doErr
 		}
 		if resp.StatusCode >= 400 {
+			defer resp.Body.Close()
 			defer drainAndClose(resp.Body)
 			return decodeAPIError(http.MethodGet, "/events", resp)
 		}
@@ -548,6 +550,7 @@ func (c *Client) doJSON(
 		if err != nil {
 			return fmt.Errorf("docker %s %s: %w", method, relPath, err)
 		}
+		defer resp.Body.Close()
 		defer drainAndClose(resp.Body)
 
 		if resp.StatusCode >= 400 {
