@@ -413,4 +413,25 @@ type Engine interface {
 	Ping(ctx context.Context) (PingInfo, error)
 	Version(ctx context.Context) (VersionInfo, error)
 
-	ListContainers(ctx context.Context,
+	ListContainers(ctx context.Context, opts ListContainersOptions) ([]ContainerSummary, error)
+	InspectContainer(ctx context.Context, id string) (ContainerInspect, error)
+	RemoveContainer(ctx context.Context, id string, opts RemoveContainerOptions) error
+	PruneContainers(ctx context.Context, filters Filters) (ContainersPruneReport, error)
+
+	ListImages(ctx context.Context, opts ListImagesOptions) ([]ImageSummary, error)
+	InspectImage(ctx context.Context, id string) (ImageInspect, error)
+	ImageHistory(ctx context.Context, id string) ([]ImageHistoryItem, error)
+	RemoveImage(ctx context.Context, id string, opts RemoveImageOptions) ([]ImageDeleteItem, error)
+	PruneImages(ctx context.Context, danglingOnly bool, filters Filters) (ImagesPruneReport, error)
+
+	PruneNetworks(ctx context.Context, filters Filters) (NetworksPruneReport, error)
+	PruneBuildCache(ctx context.Context, opts BuildCachePruneOptions) (BuildCachePruneReport, error)
+
+	ListVolumes(ctx context.Context, filters Filters) (VolumeListResponse, error)
+	RemoveVolume(ctx context.Context, name string, force bool) error
+	PruneVolumes(ctx context.Context, filters Filters) (VolumesPruneReport, error)
+
+	StreamEvents(ctx context.Context, opts EventsOptions, onEvent func(EventMessage)) error
+	BreakerStats() BreakerStats
+	Close() error
+}
