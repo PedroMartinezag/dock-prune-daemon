@@ -1,0 +1,30 @@
+name: Bug Report
+description: Report a defect in disk monitoring, OCI DAG pruning, PSI pacing, or CLI behavior.
+labels: ['bug']
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Problem Description
+      description: Clear description of what went wrong and what you expected.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to Reproduce
+      placeholder: Commands, flags, or redacted JSON config triggering the issue.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version & Platform
+      placeholder: Output of dock-prune-daemon version and Docker Engine version
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Redacted Logs / Cycle Report
+      render: text

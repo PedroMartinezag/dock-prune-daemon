@@ -1,0 +1,25 @@
+name: Feature Request
+description: Propose a new capability while respecting the zero-dependency contract.
+labels: ['enhancement']
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Operational Problem
+      description: Describe the infrastructure or storage failure mode you are solving.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Design
+      description: Outline CLI flags, config fields, or telemetry metrics needed.
+    validations:
+      required: true
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Architectural Alignment
+      options:
+        - label: Compatible with Go standard library only (zero external dependencies)
+          required: true
