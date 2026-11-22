@@ -22,21 +22,21 @@ version-resolver:
   default: patch
 
 categories:
-  - title: "🚀 Control Plane Features & CLI"
+  - title: "Control Plane Features & CLI"
     labels:
       - "feature"
       - "enhancement"
-  - title: "⚡ Kernel Pacing, Forecasting & DAG Optimization"
+  - title: "Kernel Pacing, Forecasting & DAG Optimization"
     labels:
       - "performance"
-  - title: "🛡️ Security, Cryptography & Supply Chain"
+  - title: "Security, Cryptography & Supply Chain"
     labels:
       - "security"
-  - title: "🐛 Bug Fixes & Edge-Case Hardening"
+  - title: "Bug Fixes & Edge-Case Hardening"
     labels:
       - "bug"
       - "fix"
-  - title: "🧰 CI/CD, Documentation & Maintenance"
+  - title: "CI/CD, Documentation & Maintenance"
     labels:
       - "ci"
       - "documentation"
@@ -46,25 +46,25 @@ categories:
 autolabeler:
   - label: "feature"
     branch:
-      - "/^feat\\/.+/"
+      - "/^feat\/.+/"
     title:
-      - "/^feat(\\(.*\\))?:/"
+      - "/^feat(\(.*\))?:/"
   - label: "fix"
     branch:
-      - "/^fix\\/.+/"
+      - "/^fix\/.+/"
     title:
-      - "/^fix(\\(.*\\))?:/"
+      - "/^fix(\(.*\))?:/"
   - label: "performance"
     title:
-      - "/^perf(\\(.*\\))?:/"
+      - "/^perf(\(.*\))?:/"
   - label: "security"
     title:
-      - "/^security(\\(.*\\))?:/"
+      - "/^security(\(.*\))?:/"
   - label: "documentation"
     files:
       - "*.md"
     title:
-      - "/^docs(\\(.*\\))?:/"
+      - "/^docs(\(.*\))?:/"
   - label: "ci"
     files:
       - ".github/**"
@@ -80,10 +80,11 @@ template: |
 
   ---
 
-  ### 🔐 Supply-Chain Verification (Zero External Dependencies + SLSA Provenance)
+  ### Supply-Chain Verification (Zero External Dependencies + SLSA Provenance)
 
   Every static release archive is compiled with `CGO_ENABLED=0`, zero third-party Go modules, SHA-256 checksums, and cryptographic GitHub Artifact Attestations (**SLSA v1.0 Build Provenance**):
 
   ```bash
   gh attestation verify dock-prune-daemon_linux_amd64.tar.gz --owner PedroMartinezag
   sha256sum -c SHA256SUMS
+  ```
