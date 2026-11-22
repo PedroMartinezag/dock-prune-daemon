@@ -114,15 +114,15 @@ type VerifyResult struct {
 
 // Ledger manages append-only, fsynced, Ed25519-signed Merkle audit logs with size rotation.
 type Ledger struct {
-	mu          sync.Mutex
-	enabled     bool
-	ledgerPath  string
-	maxBytes    int64
-	keys        KeyPair
-	nowFn       func() time.Time
-	seq         uint64
-	lastHash    string
-	nextAnchor  bool
+	mu         sync.Mutex
+	enabled    bool
+	ledgerPath string
+	maxBytes   int64
+	keys       KeyPair
+	nowFn      func() time.Time
+	seq        uint64
+	lastHash   string
+	nextAnchor bool
 }
 
 // NewLedger initializes or resumes an Ed25519-signed Merkle ledger on disk,
