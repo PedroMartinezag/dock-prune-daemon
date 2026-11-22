@@ -6,11 +6,21 @@
 [![Dependencies](https://img.shields.io/badge/dependencies-zero-2EA44F?style=flat)](go.mod)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue?style=flat)](LICENSE)
 
-Autonomous, zero-dependency Go daemon and CLI for surgical Docker disk reclamation. Replaces blind `docker system prune` cron jobs with OCI layer DAG math, Holt-Winters ENOSPC forecasting, Linux PSI I/O pacing, and tamper-evident Ed25519 audit ledgers.
+Autonomous, zero-dependency Go daemon and CLI for surgical Docker disk reclamation. Replaces destructive `docker system prune` cron jobs with OCI layer DAG math, Holt-Winters ENOSPC forecasting, Linux PSI I/O pacing, and tamper-evident Ed25519 audit ledgers.
+
+## Why dock-prune-daemon?
+
+| Dimension | `docker system prune` (cron) | `dock-prune-daemon` |
+| :--- | :--- | :--- |
+| **Triggering** | Blind wall-clock schedule | Closed-loop block/inode hysteresis + Holt-Winters TTE forecast |
+| **BuildKit Cache** | Wipes hot CI layers indiscriminately | Preserves hot cache floor (`build_cache_keep_bytes`) |
+| **Image Selection** | Deletes without shared-layer awareness | OCI layer DAG ranks images by *exclusive* reclaimable bytes |
+| **Host I/O Impact** | Can trigger disk stall spikes | Paces stages via Linux `/proc/pressure/io` (PSI) |
+| **Audit & Compliance** | None | Ed25519-signed SHA-256 Merkle JSONL ledger (`verify-audit`) |
 
 ## Core Capabilities
 
-- **Zero External Dependencies:** Pure Go standard library (`CGO_ENABLED=0`, no `require` directives in `go.mod`, no `go.sum`).
+- **Zero External Dependencies:** Pure Go standard library (`CGO_ENABLED=0`, ~2.8 MB static archive, no `require` directives in `go.mod`, no `go.sum`).
 - **Predictive Hysteresis Control:** Block and inode watermark bands paired with Holt-Winters double-exponential Time-To-Exhaustion (TTE) forecasting.
 - **OCI Layer DAG Planner:** Calculates exclusive reclaimable bytes across shared image layers before deletion to preserve hot CI caches.
 - **Kernel-Aware Safety:** Throttles reclamation under Linux PSI I/O pressure and detects phantom deleted-but-open file descriptors in `/proc`.
@@ -21,23 +31,48 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the control-loop diagram, w
 
 ## Quick Start
 
-### Build from Source
+### Option 1 — Prebuilt Static Binary (Linux amd64)
+
+```bash
+curl -fsSL https://github.com/PedroMartinezag/dock-prune-daemon/releases/latest/download/dock-prune-daemon_linux_amd64.tar.gz | tar -xz
+./dock-prune-daemon version
+```
+
+### Option 2 — Install with Go
+
+```bash
+go install github.com/PedroMartinezag/dock-prune-daemon/cmd/dock-prune-daemon@latest
+```
+
+### Option 3 — Build from Source
 
 ```bash
 git clone https://github.com/PedroMartinezag/dock-prune-daemon.git
-cd dock-prune-daemon
-make build
+cd dock-prune-daemon && make build
 ./bin/dock-prune-daemon version
 ```
 
-### Dry-Run Inspection
+## Dry-Run & Sample Output
 
 ```bash
-# Inspect host readiness, Docker API negotiation, PSI availability, and phantom FDs
-./bin/dock-prune-daemon doctor
+# Inspect Docker API negotiation, statfs, Linux PSI, and phantom FDs
+dock-prune-daemon doctor
 
-# Simulate one reclamation cycle without deleting resources
-./bin/dock-prune-daemon once --dry-run --force --json
+# Simulate one surgical waterfall cycle without deleting resources
+dock-prune-daemon once --dry-run --force --json
+
+# Verify the Ed25519 SHA-256 Merkle audit ledger offline
+dock-prune-daemon verify-audit --json
+```
+
+Example output from `version` and `verify-audit --json`:
+
+```text
+$ dock-prune-daemon version
+dock-prune-daemon v0.1.1 (commit=3bba2bc, built=2026-11-23T00:00:00Z, go=go1.23.0, platform=linux/amd64, zero-dep=true)
+
+$ dock-prune-daemon verify-audit --json
+{"valid":true,"verified_count":1,"last_sequence":1,"head_hash":"e3b0c442..."}
 ```
 
 ## CLI Subcommands
@@ -50,7 +85,7 @@ make build
 | `top` | Rank Docker images and containers by exclusive reclaimable bytes via OCI DAG analysis. |
 | `doctor` | Run host diagnostics across Docker Engine API, `statfs`, Linux PSI, and phantom FDs. |
 | `roi` | Report reclaimed storage, averted ENOSPC incidents, and FinOps cost savings. |
-| `verify-audit` | Cryptographically verify the SHA-256 Merkle chain and Ed25519 signatures of `audit.jsonl`. |
+| <code>verify&#8209;audit</code> | Cryptographically verify the SHA-256 Merkle chain and Ed25519 signatures of `audit.jsonl`. |
 | `version` | Print immutable build provenance (`Version`, `Commit`, `BuildDate`, `zero_external_deps`). |
 
 ## Configuration & Deployment
